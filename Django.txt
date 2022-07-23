@@ -1,0 +1,202 @@
+Create a Project :
+		django-admin startproject my_project
+
+Create an APP:
+		python manage.py startapp my_app
+Run the server:
+		python manage.py runserver 
+
+Migrate i.e update database or sync DB with code:
+		python manage.py migrate
+
+from django.urls import path, include
+
+
+
+
+For setting the DB (model) and making templates.
+First put your app in installed apps.
+		Settings -> apps -> enter  my_app.apps.My_appConfig  (which name is in apps file) and then...
+
+Migrations i.e change datanase as per my app/model i.e create tables.
+		python manage.py makemigrations my_app
+
+		python manage.py sqlmigrate app_name migration_number 	e.g:0001
+
+
+
+
+
+/*
+
+{% for loop  %}
+  
+<h1> {{ i }} </h1>    To access variable use double curly braces
+
+{%endfor %}
+
+*/
+			Reducing the HTML content
+
+Making the common HTMl content
+
+HTML Data e.g header
+
+{%block content%}   {%endblock%}
+
+HTML Data e.g footer
+
+
+Using the Common HTML content
+{% extends "my_app/base.html" %}
+{%block id1 %}
+	<h1> hello </h1>
+	<h2> I am Different </h2>
+{%endblock id1%}
+
+
+
+my_app -> templates -> my_app -> main.html ,about.html,base.html
+
+my_app  -> static -> my_app -> main.css
+
+To add CSS file, 
+	First Line= {%extends " "%} {% load static %}
+	and link< ---   href="{% static 'my_app/main.css' %}"  ---  >
+
+For url of any link ,
+	href="{% url 'name_of_url_in_UrlPatterns' %}"
+
+Create SuperUser or Admin
+	python manage.py createsuperuser        // DB should be setup first
+
+
+
+		Object Relational Mapper (ORM)
+It enables us to interact with our DB.
+
+An ORM is a code library that automates the transfer of data stored in relational 
+database tables into objects that are more commonly used in application code.
+
+We can use different DB without changing our code.
+
+Each class(in models file) is going to be a different table in DB.
+
+Check Users:
+	python manage.py shell    # To get into python interpretter mode
+	from django.contrib.auth.models import User
+	User.objects.all()
+	# User.objects.first() or .last()
+	# user = User.objects.filter(username='rafiq').first()
+	# Get user by id, user= User.objects.get(id=1)
+	# Performing quereis on the user
+		# user.id , user.pk ,
+	# from jkbose.models import papers
+	# papers.objects.all()
+
+		Board = name,class,year,link
+		college=name,stream,subject,year,link
+		competitive=name,year,link
+
+				# Reset/Delete DB, python manage.py flush
+ 
+         #Inserting data into DB
+pdf1=boards(board_name="JKBOSE" ,class_number="10" , subject="english" ,year="2018", link="Not Available" )
+pdf1.save()
+user.post_set. : all(),create( value for DB)
+
+
+	#Use DB values in Website
+models.py --> from .models import boards
+context={
+'li':boards.objects.all()
+}
+{%  for i in li %}
+
+
+{%endfor %}
+
+
+# Registering our Model: my_app -> admin.py 
+			from .models import my_model
+			admin.site.register(my_model_name)
+
+website = models.URLField(blank=True)
+python manage.py sqlmigrate home 0001
+
+python ./makemigrations
+
+
+
+			#User Registration
+Create a user form, which will take care of user logic
+from django.contrib.auth.forms import UserCreationForm
+{% csrf_token %}   // does form checking
+
+from django.contrib import messages
+message : .debug, .info, .warning, .success  --> in html message.tags
+messages.info( request , 'my_message'  )
+
+Use (django framework)Crispy_Forms for form styling
+pip install django-crispy-forms
+use enter crispy_forms in Installed apps.
+
+			# Add Media to DB
+ Add STATIC & MEDIA to settings , and then add add static to url patterns
+
+
+			# Add Login & logout for users
+
+from django.contrib.auth import views as auth_views
+	path('login/',auth_views.LoginView.as_view( template_name='users/login.html' ) ,name="login"),
+    	path('logout/',auth_views.LogoutView.as_view( template_name='users/logout.html' ) ,name="logout"),
+In settings ad: LOGIN_REDIRECT_URL='home_main'
+only those who r not logged in should see login link: if user.is_authenticated
+
+When a user is logged in, only then it can view its profile , use login required decorator
+from django.contrib.auth.decorators import login_required
+use @login_required before def profile
+also use LOGIN_URL='login' in settings, i.e login before seeing your profile
+
+
+			# User Profile Features
+the default django users model, doesn't have afield for profile pic
+make 1-1 reln b/w user and profile
+make signals.py and change apps.py file , in order to make profile for new users. 
+
+Create Profile model in user -> models.py
+for profile for every one create signals.py in users
+
+				MODEL FORM
+Allows us to work with a specific DB model , in our case profile.
+make new class/forms in user -> forms.py
+import and use these in user -> views.py
+make sure to use enctype in form tag
+
+
+
+				# Upload Data by User & Class Based Views(CBW)
+e.g: list view , detail view , create,update,delete view etc
+# <app>/<model>_<viewtype>.html
+class attributes : model,template_name,context_object_name,ordering
+In detail view, context of template is called object
+
+				# Pagination
+In ListView , paginate_by = n
+in url ?page=2   for getting into next pages
+def get_queryset in ListView for filtering and ordering of data
+.filter(boardname__startswith='jkbose').values('a','b').distinct().order_by('class_number')
+def __str__(self):
+	return self.boardname + '-' + self.class_number
+
+				# password Resetting
+add built in auth_views.PasswordResetView in main url
+use log_in & log_out template here
+url 'password_reset_confirm' uidb64=uid token=token
+PasswordResetConfirm & Done View
+Our password reset template tries to create a password reset confirm route
+use password_ not - 
+for email use google app sign in & put values in settings.py
+
+
+				# custom user model
